@@ -1,0 +1,26 @@
+name: 🔄 Keep Alive
+
+on:
+  schedule:
+    - cron: "0 12 * * *"  # Every day at noon UTC
+  workflow_dispatch:
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Keep repo active
+        run: |
+          git config --global user.name "Ahmed-Refaat"
+          git config --global user.email "ahmed-refaat@users.noreply.github.com"
+          DATE=$(date -u +"%Y-%m-%d %H:%M UTC")
+          mkdir -p .github
+          echo "$DATE" > .github/last_active.txt
+          git add .github/last_active.txt
+          git commit -m "🔄 Keep alive - $DATE" || echo "Nothing to commit"
+          git push || echo "Push failed, skipping"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
